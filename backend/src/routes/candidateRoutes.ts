@@ -16,7 +16,7 @@ router.post('/', async (req: Request, res: Response) => {
     if (error instanceof Error) {
       res.status(400).send({ message: error.message });
     } else {
-      res.status(500).send({ message: "An unexpected error occurred" });
+      res.status(500).send({ message: "Ocurrió un error inesperado" });
     }
   }
 });

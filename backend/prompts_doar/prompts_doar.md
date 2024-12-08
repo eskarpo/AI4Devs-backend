@@ -1,4 +1,4 @@
-# Creación de Endpoints para la Gestión de Candidatos.
+# Creación de Endpoints para la Gestión de Candidatos en un Tablero Kanban
 
 ## Contexto
 Tu misión es crear dos nuevos endpoints de API que facilitarán la gestión de la lista de candidatos en una interfaz estilo Kanban.
@@ -77,6 +77,9 @@ Los cambios en el proyecto deben cumplir los siguientes lineamientos:
 - Usar **Prisma** como ORM.
 - Manejar errores de manera apropiada.
 - Devolver respuestas **JSON consistentes**.
+- Adopta los principios DDD, SOLID, DRY y patrones de diseño para una arquitectura backend escalable y mantenible.
+- Asegúrate de que los datos recuperados y actualizados sean precisos y estén actualizados.
+- Maneja posibles errores con mensajes claros de error en formato JSON, considerando a los candidatos sin entrevistas   completas para el cálculo del puntaje promedio.-
 
 ## Configuración de la Aplicación
 
