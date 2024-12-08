@@ -3,6 +3,9 @@ import { validateCandidateData } from '../validator';
 import { Education } from '../../domain/models/Education';
 import { WorkExperience } from '../../domain/models/WorkExperience';
 import { Resume } from '../../domain/models/Resume';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const addCandidate = async (candidateData: any) => {
     try {
@@ -62,4 +65,73 @@ export const findCandidateById = async (id: number): Promise<Candidate | null> =
         console.error('Error al buscar el candidato:', error);
         throw new Error('Error al recuperar el candidato');
     }
+};
+
+export const getCandidatesForPosition = async (positionId: number) => {
+    const candidates = await prisma.application.findMany({
+        where: {
+            positionId: positionId
+        },
+        select: {
+            candidate: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                }
+            },
+            interviewStep: {
+                select: {
+                    name: true
+                }
+            },
+            interviews: {
+                select: {
+                    score: true
+                }
+            }
+        }
+    });
+
+    return candidates.map(app => {
+        const scores = app.interviews
+            .map(interview => interview.score)
+            .filter((score): score is number => score !== null);
+            
+        const averageScore = scores.length > 0
+            ? scores.reduce((a, b) => a + b, 0) / scores.length
+            : null;
+
+        return {
+            full_name: `${app.candidate.firstName} ${app.candidate.lastName}`,
+            current_interview_step: app.interviewStep.name,
+            average_score: averageScore ? Number(averageScore.toFixed(2)) : null
+        };
+    });
+};
+
+export const updateCandidateInterviewStage = async (
+    candidateId: number, 
+    interviewStepId: number
+) => {
+    const [candidate, interviewStep] = await Promise.all([
+        prisma.candidate.findUnique({ where: { id: candidateId } }),
+        prisma.interviewStep.findUnique({ where: { id: interviewStepId } })
+    ]);
+
+    if (!candidate) {
+        throw new Error('Candidato no encontrado');
+    }
+
+    if (!interviewStep) {
+        throw new Error('Etapa de entrevista no encontrada');
+    }
+
+    await prisma.application.updateMany({
+        where: { 
+            candidateId: candidateId,
+        },
+        data: {
+            currentInterviewStep: interviewStepId
+        }
+    });
 };
